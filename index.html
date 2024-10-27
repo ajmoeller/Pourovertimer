@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Pour Over Timer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        #timer {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 1.5rem 0;
+            color: #2c3e50;
+            font-family: monospace;
+        }
+
+        .instructions-container {
+            text-align: left;
+            margin: 2rem 0;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 0.8rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: #999;
+            background-color: #f8f9fa;
+        }
+
+        .instruction-item .time {
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin-right: 1rem;
+            min-width: 60px;
+        }
+
+        .instruction-item.active {
+            color: #2c3e50;
+            background-color: #e3f2fd;
+            font-weight: 600;
+            transform: scale(1.02);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .instruction-item.completed {
+            color: #666;
+            background-color: #f1f1f1;
+            text-decoration: line-through;
+        }
+
+        button {
+            font-size: 1.1rem;
+            padding: 0.8rem 1.5rem;
+            margin: 0.5rem;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Coffee Pour Over Timer</h1>
+        <div id="timer">00:00</div>
+        <div class="instructions-container">
+            <div class="instruction-item" data-time="0">
+                <span class="time">0:00</span>
+                <span class="text">Open switch, pour to 50g</span>
+            </div>
+            <div class="instruction-item" data-time="30">
+                <span class="time">0:30</span>
+                <span class="text">Pour to 150g, keep switch open</span>
+            </div>
+            <div class="instruction-item" data-time="60">
+                <span class="time">1:00</span>
+                <span class="text">Close switch, pour to 240g</span>
+            </div>
+            <div class="instruction-item" data-time="90">
+                <span class="time">1:30</span>
+                <span class="text">Open switch and let drain</span>
+            </div>
+        </div>
+        <div class="controls">
+            <button onclick="startTimer()">Start</button>
+            <button onclick="resetTimer()">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        let timer;
+        let seconds = 0;
+        let isRunning = false;
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                timer = setInterval(updateTimer, 1000);
+                updateInstructions(0);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            seconds = 0;
+            document.getElementById('timer').innerHTML = '00:00';
+            document.querySelectorAll('.instruction-item').forEach(item => {
+                item.classList.remove('active', 'completed');
+            });
+        }
+
+        function updateTimer() {
+            seconds++;
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            document.getElementById('timer').innerHTML = 
+                `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+
+            updateInstructions(seconds);
+        }
+
+        function updateInstructions(currentSeconds) {
+            document.querySelectorAll('.instruction-item').forEach(item => {
+                const itemTime = parseInt(item.dataset.time);
+                
+                if (currentSeconds >= itemTime) {
+                    if (currentSeconds >= itemTime + 30) {
+                        item.classList.remove('active');
+                        item.classList.add('completed');
+                    } else {
+                        item.classList.add('active');
+                        item.classList.remove('completed');
+                    }
+                } else {
+                    item.classList.remove('active', 'completed');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
